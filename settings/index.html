@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+  <style>
+    body { font-family: -apple-system, system-ui, sans-serif; padding: 18px; max-width: 480px; }
+    h2 { margin: 0 0 12px; font-size: 18px; }
+    .field { margin-bottom: 12px; }
+    label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
+    input { width: 100%; box-sizing: border-box; padding: 10px; font-size: 15px;
+            border: 1px solid #ccc; border-radius: 8px; }
+    button { margin-top: 8px; padding: 12px 18px; font-size: 15px; border: 0;
+             border-radius: 8px; background: #1aa3e8; color: #fff; cursor: pointer; }
+    button:disabled { opacity: .6; }
+    .hint { font-size: 12px; color: #888; margin-top: 12px; line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <h2>eWeLink account</h2>
+  <div class="field">
+    <label for="username">Email (or phone)</label>
+    <input id="username" type="email" autocomplete="username" placeholder="you@example.com" />
+  </div>
+  <div class="field">
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" />
+  </div>
+  <div class="field">
+    <label for="countryCode">Country code</label>
+    <input id="countryCode" type="text" value="+55" />
+  </div>
+  <button id="save">Save &amp; log in</button>
+  <p class="hint">Stored only on your Homey. Used once to fetch each device's local
+    encryption key; control then runs over your LAN with cloud fallback.
+    After saving, add the device from Devices → ＋ Add → eWeLink LAN.</p>
+
+  <script type="application/javascript">
+    function onHomeyReady(Homey) {
+      const $ = (id) => document.getElementById(id);
+
+      Homey.get('credentials', (err, creds) => {
+        if (!err && creds) {
+          $('username').value = creds.username || '';
+          $('password').value = creds.password || '';
+          $('countryCode').value = creds.countryCode || '+55';
+        }
+      });
+
+      $('save').addEventListener('click', () => {
+        const btn = $('save');
+        const creds = {
+          username: $('username').value.trim(),
+          password: $('password').value,
+          countryCode: $('countryCode').value.trim() || '+55',
+        };
+        if (!creds.username || !creds.password) {
+          Homey.alert('Email and password are required', 'error');
+          return;
+        }
+        btn.disabled = true;
+        Homey.set('credentials', creds, (err) => {
+          btn.disabled = false;
+          if (err) return Homey.alert(String(err), 'error');
+          Homey.alert('Saved. Now add the device from Devices → Add.', 'info');
+        });
+      });
+
+      Homey.ready();
+    }
+  </script>
+</body>
+</html>

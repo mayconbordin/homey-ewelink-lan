@@ -1,0 +1,56 @@
+{
+  "id": "com.ewelinklan",
+  "version": "1.0.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "platforms": ["local"],
+  "name": { "en": "eWeLink LAN" },
+  "description": { "en": "Local (LAN) control of eWeLink/SONOFF devices, with cloud fallback." },
+  "category": ["lights"],
+  "permissions": [],
+  "author": { "name": "mayconbordin" },
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png"
+  },
+  "discovery": {
+    "ewelink": {
+      "type": "mdns-sd",
+      "mdns-sd": { "name": "ewelink", "protocol": "tcp" },
+      "id": "{{txt.id}}"
+    }
+  },
+  "drivers": [
+    {
+      "id": "switch",
+      "name": { "en": "eWeLink Switch (LAN)" },
+      "class": "socket",
+      "capabilities": ["onoff"],
+      "platforms": ["local"],
+      "connectivity": ["lan"],
+      "images": {
+        "small": "/drivers/switch/assets/images/small.png",
+        "large": "/drivers/switch/assets/images/large.png"
+      },
+      "discovery": "ewelink",
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": { "next": "add_devices" },
+          "options": { "singular": false }
+        },
+        { "id": "add_devices", "template": "add_devices" }
+      ],
+      "settings": [
+        {
+          "id": "ip",
+          "type": "text",
+          "label": { "en": "Device IP address" },
+          "value": "",
+          "hint": { "en": "Static LAN IP of the switch (recommended). Leave blank to rely on mDNS discovery." }
+        }
+      ]
+    }
+  ]
+}
